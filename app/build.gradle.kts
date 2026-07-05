@@ -36,6 +36,9 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.23")
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
+
+    testImplementation("junit:junit:4.13.2")
 }
 
 repositories {

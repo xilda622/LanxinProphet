@@ -1,19 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <uses-permission
+        android:name="android.permission.READ_FRAME_BUFFER"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission
+        android:name="android.permission.WRITE_SECURE_SETTINGS"
+        tools:ignore="ProtectedPermissions" />
 
     <application
-        android:label="LanxinProphet"
         android:allowBackup="true"
+        android:label="LanxinProphet"
         android:supportsRtl="true">
+
+        <meta-data
+            android:name="com.lanxin.prophet.OCR_SERVICE_ACTION"
+            android:value="REPLACE_ME_VENDOR_OCR_ACTION" />
+        <meta-data
+            android:name="com.lanxin.prophet.OCR_SERVICE_PACKAGE"
+            android:value="REPLACE_ME_VENDOR_OCR_PACKAGE" />
+        <meta-data
+            android:name="com.lanxin.prophet.NOTES_CONTENT_URI"
+            android:value="REPLACE_ME_NOTES_CONTENT_URI" />
+        <meta-data
+            android:name="com.lanxin.prophet.NOTES_INSERT_ACTION"
+            android:value="REPLACE_ME_NOTES_INSERT_ACTION" />
+        <meta-data
+            android:name="com.lanxin.prophet.NOTES_TARGET_PACKAGE"
+            android:value="REPLACE_ME_NOTES_TARGET_PACKAGE" />
 
         <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".accessibility.ChatBubbleAccessibilityService"
+            android:description="@string/lanxin_accessibility_service_description"
+            android:exported="true"
+            android:label="@string/lanxin_accessibility_service_label"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/lanxin_accessibility_service" />
+        </service>
 
     </application>
 
