@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="lanxin_accessibility_service_label">Lanxin Chat Bubble Capture</string>
+    <string name="lanxin_accessibility_service_description">Capture selected chat bubbles from WeChat or QQ, run OCR, and sync structured notes.</string>
+</resources>
