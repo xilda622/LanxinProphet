@@ -24,46 +24,34 @@ GitHub Actions 已配置好，每次推代码会自动构建
 🧱 如何继续开发（组员必看）
 1. 修改代码位置
 所有业务代码都在：
-
-代码
 app/src/main/java/com/lanxin/prophet/
+
 UI 布局在：
-
-代码
 app/src/main/res/layout/
+
 Manifest 在：
-
-代码
 app/src/main/AndroidManifest.xml
-Gradle 配置在：
 
-代码
+Gradle 配置在：
 app/build.gradle.kts
+
 2. 添加新功能的方式
 你可以直接在 com.lanxin.prophet 包下创建新的：
-
 Activity
-
 Service
-
 View
-
 Utils 类
-
 例如：
-
-代码
 com.lanxin.prophet/FloatingBallService.kt
 com.lanxin.prophet/ScreenshotAnalyzer.kt
 com.lanxin.prophet/TripCardView.kt
+
 3. 添加依赖
 在 app/build.gradle.kts 的 dependencies {} 中添加：
 
-kotlin
 implementation("xxx:xxx:版本号")
-例如：
 
-kotlin
+例如：
 implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
 推代码后 GitHub Actions 会自动构建。
 
