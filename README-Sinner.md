@@ -5,9 +5,9 @@
 ## 1. 当前分支和提交
 
 - 当前功能分支：`codex/privileged-chat-capture`
-- 当前提交：`9a7986d Add privileged chat capture pipeline`
+- 当前分支最近的功能提交起点：`9a7986d Add privileged chat capture pipeline`
 - 远端仓库：`xilda622/LanxinProphet`
-- 当前状态：本地提交已完成，但由于 GitHub 账号 `S1nnerfps` 对该仓库没有写权限，暂时还没有成功推送到远端。
+- 当前状态：分支已经成功推送到远端 `origin/codex/privileged-chat-capture`
 
 如果后续切换到有权限的 GitHub 账号，只需要把这条分支推上去即可：
 
@@ -120,40 +120,74 @@ git push -u origin codex/privileged-chat-capture
 - 没有改原始 README
 - 资源名也单独用了 `lanxin_*` 前缀，尽量减少命名冲突
 
-## 5. Manifest 里当前还是占位值的地方
+## 5. config_vivo 已经确认并接入的真值
 
-下面这些值现在还是占位值，必须等拿到 vivo 设备上的真实接口信息后再替换：
+以下信息来自 `config_vivo/`，已经确认并接进工程：
+
+- 备忘录包名：`com.android.notes`
+- 备忘录 APK 路径：`/system/custom/app/BBKNotes/BBKNotes.apk`
+- 备忘录插入 service：`com.android.notes/.sdk.insert.NotesInsertService`
+- 备忘录插入 service 全类名：`com.android.notes.sdk.insert.NotesInsertService`
+- 备忘录插入 permission：`com.vivo.notes.permission.SHARE_TO_NOTE`
+- 备忘录候选 action：
+  - `com.android.notes.inspirationconvert`
+  - `com.android.notes.aimeetingconvert`
+  - `com.android.notes.phonemeetingconvert`
+  - `com.android.notes.aimemoryconvert`
+- 备忘录状态 service：
+  - action: `com.android.notes.action.NOTES_STATUS_INFO`
+  - service: `com.android.notes/.sdk.NotesStatusInfoService`
+  - permission: `com.android.notes.permission.NOTES_STATUS_INFO`
+- 备忘录 provider 相关权限：
+  - `com.provider.notesaccess`
+  - `com.provider.notes.full`
+
+这些值已经体现在 [AndroidManifest.xml](/E:/LanxinProphet/app/src/main/AndroidManifest.xml:1) 和 notes 适配逻辑里。
+
+## 6. 仍然缺失或暂不直接启用的部分
+
+下面这些信息还不够完整，暂时没有硬接到运行链路里：
 
 - `REPLACE_ME_VENDOR_OCR_ACTION`
 - `REPLACE_ME_VENDOR_OCR_PACKAGE`
 - `REPLACE_ME_NOTES_CONTENT_URI`
-- `REPLACE_ME_NOTES_INSERT_ACTION`
-- `REPLACE_ME_NOTES_TARGET_PACKAGE`
 
-这些字段都在：
+原因说明：
+
+- OCR 虽然找到了高可信候选：
+  - `vivo.intent.action_AI_JOVIKIT_CV_SERVICE -> com.vivo.aiservice/.jovikit.cv.JovikitCvService`
+  - `com.vivo.vtouch.action.analysis.SHOP -> com.vivo.vtouch/com.vivo.camerascan.service.VisionAnalysisService`
+- 但我们还没有拿到 vivo 真实的 Binder / AIDL 契约，当前代码里的 `IVendorOcrService` 仍然是工程侧占位接口。
+- 在这种情况下把真实 OCR action 直接写进 manifest，会导致运行时先尝试绑定真实服务，再因为接口不匹配失败，带来额外时延和日志噪音，所以这次没有默认启用。
+- 备忘录虽然已经能确认到若干 provider authority：
+  - `com.provider.notesbill -> com.android.notes/.db.BillProvider`
+  - `com.android.notes.PrivacyAuthorityProvider -> com.android.notes/.db.PrivacyAuthorityProvider`
+  - `com.android.notes.CloudSyncStateProvider -> com.android.notes/.cloudsync.CloudSyncStateProvider`
+- 但这些都不像“普通正文笔记插入入口”，当前导出文件里仍然缺少可安全写入正文的 `content://` URI、字段名和调用契约，所以 `ContentProvider insert` 路线继续保留占位。
+
+这些字段仍在：
 
 - `app/src/main/AndroidManifest.xml`
 
-如果同事手里已经有真实的 vivo 系统服务信息，优先改这里，不要在代码里写死。
-
-## 6. 同事如果要继续接手，建议顺序
+## 7. 同事如果要继续接手，建议顺序
 
 1. 先拉取这条功能分支，而不是直接在 `main` 上复制代码。
 2. 先确认设备系统版本与截图能力是否匹配。
-3. 拿到 vivo OCR 的真实 AIDL 契约或 action / package。
-4. 拿到 vivo 备忘录的真实 `ContentProvider` URI、字段名或接收 Intent 契约。
-5. 把 Manifest 占位值替换掉。
+3. 优先验证 `com.android.notes.inspirationconvert` 这条入口是否能直接落 note。
+4. 拿到 vivo OCR 的真实 AIDL 契约，确认是否就是 `com.vivo.aiservice/.jovikit.cv.JovikitCvService`。
+5. 拿到 vivo 备忘录的真实 `ContentProvider` URI、字段名。
 6. 再做真机联调和性能压测。
 
-## 7. 当前已知限制
+## 8. 当前已知限制
 
 1. 还没有完成真机联调。
-2. 还没有接入 vivo 真实 OCR 服务，只完成了 IPC 适配层。
-3. 还没有接入 vivo 真实备忘录 Provider / Service，只完成了写入适配层。
-4. 本地没有完成构建验证，因为当前这台机器缺少 `JAVA_HOME` / `java`。
-5. 当前截图实现使用的是 Android 官方无障碍截图接口，不是最终极限性能方案。
+2. 备忘录 service action 已接入，但还没完成真机验证。
+3. 还没有接入 vivo 真实 OCR Binder 契约，只完成了 IPC 适配层。
+4. 还没有接入 vivo 备忘录 `ContentProvider` URI，只完成了 service / intent 路线。
+5. 本地没有完成构建验证，因为当前这台机器缺少 `JAVA_HOME` / `java`。
+6. 当前截图实现使用的是 Android 官方无障碍截图接口，不是最终极限性能方案。
 
-## 8. 如果和其他功能并行开发，怎么避免冲突
+## 9. 如果和其他功能并行开发，怎么避免冲突
 
 - 不要直接在 `main` 上继续叠加这条功能。
 - 优先以 `codex/privileged-chat-capture` 为基础继续开发。
@@ -161,7 +195,7 @@ git push -u origin codex/privileged-chat-capture
 - 如果需要改 `app/build.gradle.kts`，注意依赖版本是否被别人一起调整。
 - 新增资源和类名尽量延续 `lanxin_` / `Lanxin` 前缀。
 
-## 9. 我这边本次实际完成的功能汇总
+## 10. 我这边本次实际完成的功能汇总
 
 这次已经落地的，不是“说明文档”，而是下面这些实际代码能力：
 
@@ -173,11 +207,13 @@ git push -u origin codex/privileged-chat-capture
 - 定位信息采集
 - 识别结果结构化封装
 - 写入系统备忘录的两套适配方式
+- 从 `config_vivo/` 反推出真实 notes package / service action / permission，并已接入
+- 从 `config_vivo/` 反推出真实 `NotesInsertService` 类名，并改成优先显式拉起 service
 - 异步协程流水线
 - Bitmap 生命周期回收
 - 基础测试替换
 
-## 10. 后续最关键的一步
+## 11. 后续最关键的一步
 
 后续不是继续扩写业务骨架，而是补齐两份真实的厂商接口信息：
 

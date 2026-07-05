@@ -5,6 +5,11 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <uses-permission android:name="com.provider.notesaccess" />
+    <uses-permission android:name="com.provider.notes.full" />
+    <uses-permission android:name="com.vivo.notes.permission.SHARE_TO_NOTE" />
+    <uses-permission android:name="com.android.notes.permission.NOTES_STATUS_INFO" />
+    <uses-permission android:name="vivo.aiservice.permission.AISERVICE_ACCESS" />
     <uses-permission
         android:name="android.permission.READ_FRAME_BUFFER"
         tools:ignore="ProtectedPermissions" />
@@ -28,10 +33,16 @@
             android:value="REPLACE_ME_NOTES_CONTENT_URI" />
         <meta-data
             android:name="com.lanxin.prophet.NOTES_INSERT_ACTION"
-            android:value="REPLACE_ME_NOTES_INSERT_ACTION" />
+            android:value="com.android.notes.inspirationconvert" />
+        <meta-data
+            android:name="com.lanxin.prophet.NOTES_INSERT_ACTIONS"
+            android:value="com.android.notes.inspirationconvert;com.android.notes.aimeetingconvert;com.android.notes.phonemeetingconvert;com.android.notes.aimemoryconvert" />
+        <meta-data
+            android:name="com.lanxin.prophet.NOTES_INSERT_SERVICE_CLASS"
+            android:value="com.android.notes.sdk.insert.NotesInsertService" />
         <meta-data
             android:name="com.lanxin.prophet.NOTES_TARGET_PACKAGE"
-            android:value="REPLACE_ME_NOTES_TARGET_PACKAGE" />
+            android:value="com.android.notes" />
 
         <activity
             android:name=".MainActivity"

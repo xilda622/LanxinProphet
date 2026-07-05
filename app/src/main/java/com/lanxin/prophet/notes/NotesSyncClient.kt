@@ -34,25 +34,47 @@ class VivoNotesSyncClient(
     }
 
     private fun dispatchStructuredIntent(note: RecognizedChatNote): Boolean {
-        val action = config.notesInsertAction ?: return false
-        val intent = Intent(action).apply {
-            config.notesTargetPackage?.let(::setPackage)
-            putExtra(EXTRA_TITLE, buildTitle(note))
-            putExtra(EXTRA_BODY, buildBody(note))
-            putExtra(EXTRA_METADATA_JSON, buildMetadataJson(note))
-            putExtra(EXTRA_CREATED_AT, note.capturedAtMillis)
-            addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
+        val actions = config.notesInsertActions
+        if (actions.isEmpty()) {
+            return false
         }
 
-        return runCatching {
-            context.startService(intent)
-            true
-        }.recoverCatching {
-            context.sendBroadcast(intent)
-            true
-        }.onFailure { throwable ->
-            Log.w(TAG, "Notes structured Intent dispatch failed", throwable)
-        }.getOrDefault(false)
+        return actions.any { action ->
+            val intent = Intent(action).apply {
+                val targetPackage = config.notesTargetPackage
+                val serviceClass = config.notesInsertServiceClass
+                if (targetPackage != null && serviceClass != null) {
+                    setClassName(targetPackage, serviceClass)
+                } else {
+                    targetPackage?.let(::setPackage)
+                }
+                putExtra(EXTRA_TITLE, buildTitle(note))
+                putExtra(EXTRA_BODY, buildBody(note))
+                putExtra(EXTRA_METADATA_JSON, buildMetadataJson(note))
+                putExtra(EXTRA_CREATED_AT, note.capturedAtMillis)
+                addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
+            }
+
+            val started = runCatching {
+                context.startService(intent) != null
+            }.onFailure { throwable ->
+                Log.w(TAG, "Notes service start failed for action=$action", throwable)
+            }.getOrDefault(false)
+            if (started) {
+                return@any true
+            }
+
+            if (intent.component != null) {
+                return@any false
+            }
+
+            runCatching {
+                context.sendBroadcast(intent)
+                true
+            }.onFailure { throwable ->
+                Log.w(TAG, "Notes broadcast fallback failed for action=$action", throwable)
+            }.getOrDefault(false)
+        }
     }
 
     private fun buildContentValues(note: RecognizedChatNote): ContentValues {
