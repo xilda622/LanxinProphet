@@ -36,10 +36,13 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.23")
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
+
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.9.23")
+    testImplementation("org.json:json:20240303")
 }
 
 repositories {
     google()
     mavenCentral()
 }
-
